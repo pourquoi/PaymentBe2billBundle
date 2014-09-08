@@ -1,8 +1,8 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Callback\Controller;
+namespace Pourquoi\PaymentBe2billBundle\Callback\Controller;
 
-use Rezzza\PaymentBe2billBundle\Callback\Callback3dsRequest;
+use Pourquoi\PaymentBe2billBundle\Callback\Callback3dsRequest;
 
 /**
  * Interface for 3DS callback controllers.

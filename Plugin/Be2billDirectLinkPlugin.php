@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Plugin;
+namespace Pourquoi\PaymentBe2billBundle\Plugin;
 
 use JMS\Payment\CoreBundle\Plugin\PluginInterface;
 use JMS\Payment\CoreBundle\Plugin\Exception\FinancialException;
@@ -8,8 +8,9 @@ use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
 use JMS\Payment\CoreBundle\Plugin\AbstractPlugin;
 use JMS\Payment\CoreBundle\Entity\ExtendedData;
 
-use Rezzza\PaymentBe2billBundle\Client\Client;
-use Rezzza\PaymentBe2billBundle\Plugin\Exception\SecureActionRequiredException;
+use Pourquoi\PaymentBe2billBundle\Client\Client;
+use Pourquoi\PaymentBe2billBundle\Client\Response;
+use Pourquoi\PaymentBe2billBundle\Plugin\Exception\SecureActionRequiredException;
 
 /**
  * This file is part of the RezzzaPaymentBe2billBundle package.
@@ -26,89 +27,138 @@ use Rezzza\PaymentBe2billBundle\Plugin\Exception\SecureActionRequiredException;
  */
 class Be2billDirectLinkPlugin extends AbstractPlugin
 {
-    protected $client;
-    protected $apiEndPoints;
+	const PAYMENT_OPERATION = 'payment';
+	const AUTHORIZATION_OPERATION = 'authorization';
+	const REFUND_OPERATION = 'refund';
+	const CREDIT_OPERATION = 'credit';
+	const CAPTURE_OPERATION = 'capture';
 
-    public function __construct(Client $client, $isDebug)
-    {
-        $this->client = $client;
-        $this->client->setDebug($isDebug);
+	protected $client;
+	protected $formResponse;
 
-        parent::__construct($isDebug);
-    }
+	public function __construct(Client $client, $isDebug)
+	{
+		$this->client = $client;
+		$this->client->setDebug($isDebug);
 
-    public function processes($paymentSystemName)
-    {
-        return 'be2bill_direct_link' === $paymentSystemName;
-    }
+		parent::__construct($isDebug);
+	}
 
-    public function approveAndDeposit(FinancialTransactionInterface $transaction, $retry)
-    {
-        $this->approve($transaction, $retry);
-        $this->deposit($transaction, $retry);
-    }
+	public function processes($paymentSystemName)
+	{
+		return 'be2bill' === $paymentSystemName;
+	}
 
-    public function approve(FinancialTransactionInterface $transaction, $retry)
-    {
-        $transaction->setProcessedAmount($transaction->getPayment()->getTargetAmount());
-        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
-        $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
-    }
+	/**
+	 * Set the response parsed by the notification callback (form payment or authorization).
+	 * This should be called before calling the approve/approveAndDeposit methods wich will then clear this response.
+	 *
+	 * @param Response $response
+	 */
+	public function setFormResponse(Response $response)
+	{
+		$this->formResponse = $response;
+	}
 
-    public function deposit(FinancialTransactionInterface $transaction, $retry)
-    {
-        $parameters = $transaction->getPayment()->getPaymentInstruction()->getExtendedData()->get('be2bill_direct_link_params');
+	/**
+	 * Performs the be2bill 'PAYMENT' method
+	 *
+	 * @param FinancialTransactionInterface $transaction
+	 * @param bool $retry
+	 */
+	public function approveAndDeposit(FinancialTransactionInterface $transaction, $retry)
+	{
+		$this->executeMethod($transaction, self::PAYMENT_OPERATION);
+	}
 
-        $response = $this->client->requestPayment($parameters);
+	/**
+	 * Performs the be2bill 'AUTHORIZATION' method
+	 *
+	 * @param FinancialTransactionInterface $transaction
+	 * @param bool $retry
+	 */
+	public function approve(FinancialTransactionInterface $transaction, $retry)
+	{
+		$this->executeMethod($transaction, self::AUTHORIZATION_OPERATION);
+	}
 
-        $transaction->setTrackingId($response->getTransactionId());
+	/**
+	 * Performs the be2bill 'CAPTURE' method
+	 *
+	 * @param FinancialTransactionInterface $transaction
+	 * @param bool $retry
+	 */
+	public function deposit(FinancialTransactionInterface $transaction, $retry)
+	{
+		$this->executeMethod($transaction, self::CAPTURE_OPERATION);
+	}
 
-        if ($response->isSecureActionRequired()) {
-            $exception = new SecureActionRequiredException(sprintf('Deposit : transaction "%s" waits approval by 3DS', $response->getTransactionId()));
-            $exception->setHtml($response->getSecureHtml());
+	/**
+	 * Performs the be2bill 'CREDIT' method
+	 *
+	 * @param FinancialTransactionInterface $transaction
+	 * @param bool $retry
+	 */
+	public function credit(FinancialTransactionInterface $transaction, $retry)
+	{
+		$this->executeMethod($transaction, self::CREDIT_OPERATION);
+	}
 
-            throw $exception;
-        }
+	/**
+	 * @param FinancialTransactionInterface $transaction
+	 * @param $method
+	 *
+	 * @throws \JMS\Payment\CoreBundle\Plugin\Exception\FinancialException
+	 * @throws Exception\SecureActionRequiredException
+	 */
+	protected function executeMethod(FinancialTransactionInterface $transaction, $method)
+	{
+		$data = $transaction->getPayment()->getPaymentInstruction()->getExtendedData();
+		$parameters = $data->get('be2bill_params');
 
-        if ($response->getAlias()) {
-            $extendedData = new ExtendedData;
-            $extendedData->set('ALIAS', $response->getAlias());
-            $transaction->setExtendedData($extendedData);
-        }
+		$response = $this->formResponse ? : $this->client->sendApiRequest($this->client->configureParameters($method, $parameters));
+		$this->formResponse = null;
 
-        if (!$response->isSuccess()) {
-            $exception = new FinancialException(sprintf('Deposit : transaction "%s" is not valid', $response->getTransactionId()));
-            $exception->setFinancialTransaction($transaction);
-            $transaction->setResponseCode($response->getExecutionCode());
-            $transaction->setReasonCode($response->getMessage());
+		$transaction->setTrackingId($response->getTransactionId());
 
-            throw $exception;
-        }
+		if ($response->isSecureActionRequired()) {
+			$exception = new SecureActionRequiredException(sprintf('%s : transaction "%s" waits approval by 3DS', $method, $response->getTransactionId()));
+			$exception->setHtml($response->getSecureHtml());
 
-        $transaction->setProcessedAmount($transaction->getPayment()->getTargetAmount());
-        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
-        $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
-    }
+			throw $exception;
+		}
 
-    public function credit(FinancialTransactionInterface $transaction, $retry)
-    {
-        $parameters = $transaction->getCredit()->getPaymentInstruction()->getExtendedData()->get('be2bill_direct_link_params');
+		$extendedData = new ExtendedData;
 
-        $response = $this->client->requestRefund($parameters);
+		if ($response->getAlias()) {
+			$extendedData->set('ALIAS', $response->getAlias());
+		}
+		if ($response->getCardCode()) {
+			$extendedData->set('CARDCODE', $response->getCardCode());
+		}
+		if ($response->getCardFullName()) {
+			$extendedData->set('CARDFULLNAME', $response->getCardFullName());
+		}
+		if ($response->getCardValidityDate()) {
+			$extendedData->set('CARDVALIDITYDATE', $response->getCardValidityDate());
+		}
+		if ($response->getCardType()) {
+			$extendedData->set('CARDTYPE', $response->getCardType());
+		}
 
-        $transaction->setTrackingId($response->getTransactionId());
+		$transaction->setExtendedData($extendedData);
 
-        if (!$response->isSuccess()) {
-            $exception = new FinancialException(sprintf('Credit: transaction "%s" is not valid', $response->getTransactionId()));
-            $exception->setFinancialTransaction($transaction);
-            $transaction->setResponseCode($response->getExecutionCode());
-            $transaction->setReasonCode($response->getMessage());
+		if (!$response->isSuccess()) {
+			$exception = new FinancialException(sprintf('%s : transaction "%s" is not valid', $method, $response->getTransactionId()));
+			$exception->setFinancialTransaction($transaction);
+			$transaction->setResponseCode($response->getExecutionCode());
+			$transaction->setReasonCode($response->getMessage());
 
-            throw $exception;
-        }
+			throw $exception;
+		}
 
-        $transaction->setProcessedAmount($transaction->getCredit()->getTargetAmount());
-        $transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
-        $transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
-    }
+		$transaction->setProcessedAmount($transaction->getPayment()->getTargetAmount());
+		$transaction->setResponseCode(PluginInterface::RESPONSE_CODE_SUCCESS);
+		$transaction->setReasonCode(PluginInterface::REASON_CODE_SUCCESS);
+	}
 }

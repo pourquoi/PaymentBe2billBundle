@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\DependencyInjection;
+namespace Pourquoi\PaymentBe2billBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-class RezzzaPaymentBe2billExtension extends Extension
+class PourquoiPaymentBe2billExtension extends Extension
 {
     /**
      * {@inheritDoc}
@@ -39,5 +39,6 @@ class RezzzaPaymentBe2billExtension extends Extension
         $container->setParameter('payment.be2bill.identifier', $config['identifier']);
         $container->setParameter('payment.be2bill.password', $config['password']);
         $container->setParameter('payment.be2bill.default_3ds_display_mode', $config['default_3ds_display_mode']);
+		$container->setParameter('payment.be2bill.version', $config['version']);
     }
 }

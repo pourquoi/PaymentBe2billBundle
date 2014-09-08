@@ -1,6 +1,7 @@
 <?php
-namespace Rezzza\PaymentBe2billBundle\Client;
+namespace Pourquoi\PaymentBe2billBundle\Client;
 
+use Pourquoi\PaymentBe2billBundle\Plugin\Be2billDirectLinkPlugin;
 use Symfony\Component\BrowserKit\Response as RawResponse;
 use JMS\Payment\CoreBundle\BrowserKit\Request;
 use JMS\Payment\CoreBundle\Plugin\Exception\CommunicationException;
@@ -18,10 +19,6 @@ use JMS\Payment\CoreBundle\Plugin\Exception\CommunicationException;
  */
 class Client
 {
-    const PAYMENT_OPERATION = 'payment';
-    const AUTHORIZATION_OPERATION = 'authorization';
-    const REFUND_OPERATION = 'refund';
-
     const SECURE_3DS_PARAM = '3DSECURE';
     const DISPLAY_MODE_3DS_PARAM = '3DSECUREDISPLAYMODE';
 
@@ -31,13 +28,15 @@ class Client
     protected $isDebug;
     protected $curlOptions;
     protected $default3dsDisplayMode;
+	protected $version;
 
-    public function __construct($identifier, $password, $isDebug, $default3dsDisplayMode)
+    public function __construct($identifier, $password, $isDebug, $default3dsDisplayMode, $version)
     {
         $this->identifier = $identifier;
         $this->password = $password;
         $this->isDebug = (bool) $isDebug;
         $this->default3dsDisplayMode = $default3dsDisplayMode;
+		$this->version = $version;
         $this->curlOptions = array();
         $this->apiEndPoints = array(
             'sandbox' => array(
@@ -71,6 +70,7 @@ class Client
 
         $parameters['IDENTIFIER'] = $this->identifier;
         $parameters['OPERATIONTYPE'] = $operation;
+		$parameters['VERSION'] = $this->version;
 
         if (isset($parameters['AMOUNT'])) {
             $parameters['AMOUNT'] = $this->convertAmountToBe2billFormat($parameters['AMOUNT']);
@@ -90,7 +90,7 @@ class Client
     private function configure3dsParameters($operation, array &$parameters)
     {
         // 3DS is only supported on payment and authorization operations
-        if (self::AUTHORIZATION_OPERATION !== $operation && self::PAYMENT_OPERATION!== $operation) {
+        if (Be2billDirectLinkPlugin::AUTHORIZATION_OPERATION !== $operation && Be2billDirectLinkPlugin::PAYMENT_OPERATION!== $operation) {
             if (isset($parameters[self::SECURE_3DS_PARAM])) {
                 unset($parameters[self::SECURE_3DS_PARAM]);
             }
@@ -119,20 +119,6 @@ class Client
     private function is3dsEnabledFromParameters(array $parameters)
     {
         return isset($parameters[self::SECURE_3DS_PARAM]) && 'yes' === $parameters[self::SECURE_3DS_PARAM];
-    }
-
-    public function requestPayment(array $parameters)
-    {
-        return $this->sendApiRequest(
-            $this->configureParameters(self::PAYMENT_OPERATION, $parameters)
-        );
-    }
-
-    public function requestRefund(array $parameters)
-    {
-        return $this->sendApiRequest(
-            $this->configureParameters(self::REFUND_OPERATION, $parameters)
-        );
     }
 
     public function sendApiRequest(array $parameters)

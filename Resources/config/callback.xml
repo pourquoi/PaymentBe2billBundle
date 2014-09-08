@@ -5,7 +5,7 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="payment.be2bill.callback.3ds_controller.class">Rezzza\PaymentBe2billBundle\Callback\Controller\EntityCallback3dsController</parameter>
+        <parameter key="payment.be2bill.callback.3ds_controller.class">Pourquoi\PaymentBe2billBundle\Callback\Controller\EntityCallback3dsController</parameter>
     </parameters>
 
     <services>

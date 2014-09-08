@@ -1,9 +1,9 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Tests\Units\Callback;
+namespace Pourquoi\PaymentBe2billBundle\Tests\Units\Callback;
 
 use mageekguy\atoum;
-use Rezzza\PaymentBe2billBundle\Callback\Callback3dsRequest as TestedRequest;
+use Pourquoi\PaymentBe2billBundle\Callback\Callback3dsRequest as TestedRequest;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

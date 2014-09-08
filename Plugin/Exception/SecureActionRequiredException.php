@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Plugin\Exception;
+namespace Pourquoi\PaymentBe2billBundle\Plugin\Exception;
 
 use JMS\Payment\CoreBundle\Plugin\Exception\ActionRequiredException;
 

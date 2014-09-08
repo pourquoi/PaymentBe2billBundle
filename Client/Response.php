@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Client;
+namespace Pourquoi\PaymentBe2billBundle\Client;
 
 use Symfony\Component\HttpFoundation\ParameterBag;
 
@@ -32,6 +32,11 @@ class Response
         $this->secure = $secure;
     }
 
+	public function getOrderId()
+	{
+		return $this->body->get('ORDERID');
+	}
+
     public function getOperationType()
     {
         return $this->body->get('OPERATIONTYPE');
@@ -61,6 +66,34 @@ class Response
     {
         return $this->body->get('ALIAS');
     }
+
+	/**
+	 * Card code with only last 4 digits shown (XXXXXXXXXXXX1234).
+	 * @return string | null
+	 */
+	public function getCardCode()
+	{
+		return $this->body->get('CARDCODE');
+	}
+
+	/**
+	 * Expiration date format: MM-YY
+	 * @return string | null
+	 */
+	public function getCardValidityDate()
+	{
+		return $this->body->get('CARDVALIDITYDATE');
+	}
+
+	public function getCardType()
+	{
+		return $this->body->get('CARDTYPE');
+	}
+
+	public function getCardFullName()
+	{
+		return $this->body->get('CARDFULLNAME');
+	}
 
     /**
      * Tells if an action needs to be performed by the user

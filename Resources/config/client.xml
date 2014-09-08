@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="payment.be2bill.client.class">Rezzza\PaymentBe2billBundle\Client\Client</parameter>
+        <parameter key="payment.be2bill.client.class">Pourquoi\PaymentBe2billBundle\Client\Client</parameter>
     </parameters>
 
     <services>
@@ -14,6 +14,7 @@
             <argument>%payment.be2bill.password%</argument>
             <argument>%payment.be2bill.debug%</argument>
             <argument>%payment.be2bill.default_3ds_display_mode%</argument>
+            <argument>%payment.be2bill.version%</argument>
         </service>
 
     </services>

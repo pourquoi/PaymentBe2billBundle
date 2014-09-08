@@ -1,9 +1,9 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Tests\Units\Client;
+namespace Pourquoi\PaymentBe2billBundle\Tests\Units\Client;
 
 use mageekguy\atoum;
-use Rezzza\PaymentBe2billBundle\Client\Client as TestedClient;
+use Pourquoi\PaymentBe2billBundle\Client\Client as TestedClient;
 
 /**
  * This file is part of the RezzzaPaymentBe2billBundle package.
@@ -24,13 +24,13 @@ class Client extends atoum\test
     public function testConstruct()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
                 ->boolean($client->getDebug())
                     ->isFalse()
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', true, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', true, 'main', '2.0'))
                 ->boolean($client->getDebug())
                     ->isTrue()
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
                 ->boolean($client->getDebug())
                     ->isFalse()
         ;
@@ -39,7 +39,7 @@ class Client extends atoum\test
     public function testSetDebug()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
                 ->boolean($client->getDebug())
                     ->isFalse()
             ->if($client->setDebug(true))
@@ -64,7 +64,7 @@ class Client extends atoum\test
         );
 
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
                 ->array($client->getApiEndpoints(false))
                     ->isIdenticalTo($apiEndPoints['production'])
             ->if($client->setDebug(true))
@@ -76,7 +76,7 @@ class Client extends atoum\test
     public function testSortParameters()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
             ->and($parameters = array(
                 'CLIENTIDENT'      => '404',
                 'CLIENTREFERRER'   => 'example.org',
@@ -116,10 +116,10 @@ class Client extends atoum\test
     public function testConvertAmountToBe2billFormat()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
                 ->integer($amount = $client->convertAmountToBe2billFormat('23.99'))
                     ->isIdenticalTo(2399)
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
                 ->integer($client->convertAmountToBe2billFormat('23'))
                     ->isIdenticalTo(2300)
         ;
@@ -128,7 +128,7 @@ class Client extends atoum\test
     public function testGetSignature()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
             ->and($parameters = array(
                 'CLIENTREFERRER'=> 'example.org',
                 'CLIENTIDENT'   => '404',
@@ -141,8 +141,8 @@ class Client extends atoum\test
     public function testConfigure3dsParametersUnsupportedOperation()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
-            ->and($parameters = array('3DSECURE' => 'yes', '3DSECUREDISPLAYMODE' => 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
+            ->and($parameters = array('3DSECURE' => 'yes', '3DSECUREDISPLAYMODE' => 'main', '2.0'))
             ->and($parameters = $client->configureParameters('invalid', $parameters))
                 ->array($params = $parameters['params'])
                     ->notHasKeys(array('3DSECURE', '3DSECUREDISPLAYMODE'))
@@ -152,7 +152,7 @@ class Client extends atoum\test
     public function testConfigure3dsParameters()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
             ->and($parameters = array('3DSECURE' => 'yes', '3DSECUREDISPLAYMODE' => 'top'))
             ->and($parameters = $client->configureParameters('payment', $parameters))
             ->and($params = $parameters['params'])
@@ -166,7 +166,7 @@ class Client extends atoum\test
     public function testConfigure3dsParametersDefaultMode()
     {
         $this
-            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main'))
+            ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
             ->and($parameters = array('3DSECURE' => 'yes'))
             ->and($parameters = $client->configureParameters('payment', $parameters))
             ->and($params = $parameters['params'])

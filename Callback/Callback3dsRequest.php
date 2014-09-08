@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Callback;
+namespace Pourquoi\PaymentBe2billBundle\Callback;
 
 use Symfony\Component\HttpFoundation\Request;
 

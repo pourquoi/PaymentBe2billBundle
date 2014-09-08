@@ -1,9 +1,9 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Callback\Controller;
+namespace Pourquoi\PaymentBe2billBundle\Callback\Controller;
 
 use JMS\Payment\CoreBundle\Model\FinancialTransactionInterface;
-use Rezzza\PaymentBe2billBundle\Callback\Callback3dsRequest;
+use Pourquoi\PaymentBe2billBundle\Callback\Callback3dsRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Doctrine\ORM\EntityManager;
 

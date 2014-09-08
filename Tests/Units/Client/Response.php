@@ -1,9 +1,9 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Tests\Units\Client;
+namespace Pourquoi\PaymentBe2billBundle\Tests\Units\Client;
 
 use mageekguy\atoum;
-use Rezzza\PaymentBe2billBundle\Client\Response as TestedResponse;
+use Pourquoi\PaymentBe2billBundle\Client\Response as TestedResponse;
 
 /**
  * This file is part of the RezzzaPaymentBe2billBundle package.

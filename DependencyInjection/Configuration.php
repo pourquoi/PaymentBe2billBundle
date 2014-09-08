@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\DependencyInjection;
+namespace Pourquoi\PaymentBe2billBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -26,7 +26,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
 
         return $treeBuilder
-            ->root('rezzza_payment_be2bill','array')
+            ->root('pourquoi_payment_be2bill','array')
                 ->children()
                     ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                     ->scalarNode('identifier')->isRequired()->cannotBeEmpty()->end()
@@ -38,6 +38,7 @@ class Configuration implements ConfigurationInterface
                             ->thenInvalid('Invalid 3d secure display mode "%s"')
                         ->end()
                     ->end()
+					->scalarNode('version')->isRequired()->cannotBeEmpty()->end()
                 ->end()
             ->end()
         ;

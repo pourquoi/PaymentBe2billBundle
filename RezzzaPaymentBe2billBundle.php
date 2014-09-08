@@ -1,6 +1,6 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle;
+namespace Pourquoi\PaymentBe2billBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -15,6 +15,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 /**
  * @author Jérémy Romey <jeremy@free-agent.fr>
  */
-class RezzzaPaymentBe2billBundle extends Bundle
+class PourquoiPaymentBe2billBundle extends Bundle
 {
 }

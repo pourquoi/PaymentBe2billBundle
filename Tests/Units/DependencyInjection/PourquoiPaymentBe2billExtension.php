@@ -1,9 +1,9 @@
 <?php
 
-namespace Rezzza\PaymentBe2billBundle\Tests\Units\DependencyInjection;
+namespace Pourquoi\PaymentBe2billBundle\Tests\Units\DependencyInjection;
 
 use mageekguy\atoum;
-use Rezzza\PaymentBe2billBundle\DependencyInjection\RezzzaPaymentBe2billExtension as TestedExtension;
+use Pourquoi\PaymentBe2billBundle\DependencyInjection\PourquoiPaymentBe2billExtension as TestedExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
  * @uses atoum\test
  * @author Florian Voutzinos <florian@voutzinos.com>
  */
-class RezzzaPaymentBe2billExtension extends atoum\test
+class PourquoiPaymentBe2billExtension extends atoum\test
 {
     public function testCreateClientDefaultDisplayMode()
     {
@@ -29,8 +29,8 @@ class RezzzaPaymentBe2billExtension extends atoum\test
             ->if(
                 $container = new ContainerBuilder(),
                 $extension = new TestedExtension(),
-                $config = array('rezzza_payment_be2bill' =>
-                array('identifier' => 'test', 'password' => 'test')
+                $config = array('pourquoi_payment_be2bill' =>
+                array('identifier' => 'test', 'password' => 'test', 'version' => '2.0')
             ))
             ->and($extension->load($config, $container))
                 ->string($container->getParameter('payment.be2bill.identifier'))
@@ -48,8 +48,8 @@ class RezzzaPaymentBe2billExtension extends atoum\test
             ->if(
                 $container = new ContainerBuilder(),
                 $extension = new TestedExtension(),
-                $config = array('rezzza_payment_be2bill' =>
-                array('identifier' => 'test', 'password' => 'test', 'default_3ds_display_mode' => 'popup')
+                $config = array('pourquoi_payment_be2bill' =>
+                array('identifier' => 'test', 'password' => 'test', 'default_3ds_display_mode' => 'popup', 'version' => '2.0')
             ))
             ->and($extension->load($config, $container))
                 ->string($container->getParameter('payment.be2bill.identifier'))
@@ -66,8 +66,8 @@ class RezzzaPaymentBe2billExtension extends atoum\test
         $this
             ->if(
                 $container = new ContainerBuilder(),
-                $config = array('rezzza_payment_be2bill' =>
-                array('identifier' => 'test', 'password' => 'test', 'default_3ds_display_mode' => 'INVALID')
+                $config = array('pourquoi_payment_be2bill' =>
+                array('identifier' => 'test', 'password' => 'test', 'default_3ds_display_mode' => 'INVALID', 'version' => '2.0')
             ))
             ->and($extension = new TestedExtension())
                 ->exception(function () use ($extension, $config, $container) {
@@ -82,15 +82,15 @@ class RezzzaPaymentBe2billExtension extends atoum\test
             ->if(
                 $container = new ContainerBuilder(),
                 $extension = new TestedExtension(),
-                $config = array('rezzza_payment_be2bill' =>
-                    array('identifier' => 'test', 'password' => 'test')
+                $config = array('pourquoi_payment_be2bill' =>
+                    array('identifier' => 'test', 'password' => 'test', 'version' => '2.0')
                 ),
                 $extension->load($config, $container),
                 $definition = $container->getDefinition('payment.be2bill.callback.3ds_controller'),
                 $class = $container->getParameter('payment.be2bill.callback.3ds_controller.class')
             )
             ->string($class)
-                ->isEqualTo('Rezzza\PaymentBe2billBundle\Callback\Controller\EntityCallback3dsController')
+                ->isEqualTo('Pourquoi\PaymentBe2billBundle\Callback\Controller\EntityCallback3dsController')
             ->string($definition->getClass())
                 ->isEqualTo('%payment.be2bill.callback.3ds_controller.class%')
             ->object($definition->getArgument(0))
