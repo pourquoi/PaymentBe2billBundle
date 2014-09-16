@@ -22,7 +22,8 @@ class Client
     const SECURE_3DS_PARAM = '3DSECURE';
     const DISPLAY_MODE_3DS_PARAM = '3DSECUREDISPLAYMODE';
 
-    protected $apiEndPoints;
+    protected $formEndpoints;
+    protected $apiEndpoints;
     protected $identifier;
     protected $password;
     protected $isDebug;
@@ -38,14 +39,18 @@ class Client
         $this->default3dsDisplayMode = $default3dsDisplayMode;
 		$this->version = $version;
         $this->curlOptions = array();
-        $this->apiEndPoints = array(
+        $this->formEndpoints = array(
+            'sandbox' => 'https://secure-test.be2bill.com/front/form/process',
+            'production' => 'https://secure-magenta1.be2bill.com/front/form/process'
+        );
+        $this->apiEndpoints = array(
             'sandbox' => array(
                 'https://secure-test.be2bill.com/front/service/rest/process',
             ),
             'production' => array(
-                'https://secure-magenta1.be2bill.com/front/service/rest/process.php',
-                'https://secure-magenta2.be2bill.com/front/service/rest/process.php',
-            ),
+                'https://secure-magenta1.be2bill.com/front/service/rest/process',
+                'https://secure-magenta2.be2bill.com/front/service/rest/process',
+            )
         );
     }
 
@@ -59,9 +64,14 @@ class Client
         return $this->isDebug;
     }
 
-    public function getApiEndpoints($isDebug)
+    public function getApiEndpoints()
     {
-        return (true === $isDebug) ? $this->apiEndPoints['sandbox'] : $this->apiEndPoints['production'];
+        return (true === $this->getDebug()) ? $this->apiEndpoints['sandbox'] : $this->apiEndpoints['production'];
+    }
+
+    public function getFormEndpoint()
+    {
+        return (true === $this->getDebug() ) ? $this->formEndpoints['sandbox'] : $this->formEndpoints['production'];
     }
 
     public function configureParameters($operation, array $parameters)
@@ -123,7 +133,7 @@ class Client
 
     public function sendApiRequest(array $parameters)
     {
-        $apiEndPoints = $this->getApiEndpoints($this->isDebug);
+        $apiEndPoints = $this->getApiEndpoints();
         if (empty($apiEndPoints)) {
             throw new CommunicationException('No Api Endpoint configured.');
         }

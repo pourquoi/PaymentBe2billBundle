@@ -58,20 +58,37 @@ class Client extends atoum\test
                 'https://secure-test.be2bill.com/front/service/rest/process',
             ),
             'production' => array(
-                'https://secure-magenta1.be2bill.com/front/service/rest/process.php',
-                'https://secure-magenta2.be2bill.com/front/service/rest/process.php',
+                'https://secure-magenta1.be2bill.com/front/service/rest/process',
+                'https://secure-magenta2.be2bill.com/front/service/rest/process',
             ),
         );
 
         $this
             ->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
-                ->array($client->getApiEndpoints(false))
+                ->array($client->getApiEndpoints())
                     ->isIdenticalTo($apiEndPoints['production'])
             ->if($client->setDebug(true))
-                ->array($client->getApiEndpoints(true))
+                ->array($client->getApiEndpoints())
                     ->isIdenticalTo($apiEndPoints['sandbox'])
         ;
     }
+
+	public function testGetFormendpoint()
+	{
+		$formEndPoints = array(
+			'sandbox' =>'https://secure-test.be2bill.com/front/form/process',
+			'production' => 'https://secure-magenta1.be2bill.com/front/form/process'
+		);
+
+		$this
+			->if($client = new TestedClient('CHUCKNORRIS', 'CuirMoustache', false, 'main', '2.0'))
+				->string($client->getFormEndpoint())
+					->isIdenticalTo($formEndPoints['production'])
+			->if($client->setDebug(true))
+				->string($client->getFormEndpoint())
+					->isIdenticalTo($formEndPoints['sandbox'])
+		;
+	}
 
     public function testSortParameters()
     {

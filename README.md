@@ -27,7 +27,7 @@ Since be2bill does not allow sending credit card data through their API, the fir
 
             $paymentInstruction = new PaymentInstruction($product->getAmount(), 'EUR', 'be2bill', $data);
 
-            $this->get('payment.plugin_controller')->createPaymentInstruction($paymentInstruction);
+            $this->get('payment.plugin_controller')->createPaymentInstruction(Be2billDirectLinkPlugin::PAYMENT_OPERATION, $paymentInstruction);
 
             $order->setPaymentInstruction($paymentInstruction);
             $this->get('doctrine')->getManager()->flush();
