@@ -31,7 +31,7 @@ class Client
     protected $default3dsDisplayMode;
 	protected $version;
 
-    public function __construct($identifier, $password, $isDebug, $default3dsDisplayMode, $version)
+    public function __construct($identifier, $password, $isDebug, $debugBaseUrl, $default3dsDisplayMode, $version)
     {
         $this->identifier = $identifier;
         $this->password = $password;
@@ -40,12 +40,12 @@ class Client
 		$this->version = $version;
         $this->curlOptions = array();
         $this->formEndpoints = array(
-            'sandbox' => 'https://secure-test.be2bill.com/front/form/process',
+            'sandbox' => $debugBaseUrl . 'form/process',
             'production' => 'https://secure-magenta1.be2bill.com/front/form/process'
         );
         $this->apiEndpoints = array(
             'sandbox' => array(
-				'https://secure-test.be2bill.com/front/service/rest/process',
+				$debugBaseUrl . 'service/rest/process',
             ),
             'production' => array(
                 'https://secure-magenta1.be2bill.com/front/service/rest/process',

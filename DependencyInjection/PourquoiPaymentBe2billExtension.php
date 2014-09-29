@@ -35,10 +35,12 @@ class PourquoiPaymentBe2billExtension extends Extension
         $xmlLoader->load('gateway.xml');
         $xmlLoader->load('callback.xml');
 
+		$container->setParameter('payment.be2bill.debug_base_url', $config['debug_base_url']);
         $container->setParameter('payment.be2bill.debug', $config['debug']);
         $container->setParameter('payment.be2bill.identifier', $config['identifier']);
         $container->setParameter('payment.be2bill.password', $config['password']);
         $container->setParameter('payment.be2bill.default_3ds_display_mode', $config['default_3ds_display_mode']);
 		$container->setParameter('payment.be2bill.version', $config['version']);
+
     }
 }
