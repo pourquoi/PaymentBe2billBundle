@@ -45,7 +45,7 @@ class Client
         );
         $this->apiEndpoints = array(
             'sandbox' => array(
-                'https://secure-test.be2bill.com/front/service/rest/process',
+				'https://secure-test.be2bill.com/front/service/rest/process',
             ),
             'production' => array(
                 'https://secure-magenta1.be2bill.com/front/service/rest/process',
@@ -58,6 +58,12 @@ class Client
     {
         $this->isDebug = !!$isDebug;
     }
+
+	public function setDebugBaseUrl($debugBaseUrl)
+	{
+		$this->formEndpoints['sandbox'] = $debugBaseUrl . 'form/process';
+		$this->apiEndpoints['sandbox'][0] = $debugBaseUrl . 'service/rest/process';
+	}
 
     public function getDebug()
     {
@@ -86,15 +92,14 @@ class Client
             $parameters['AMOUNT'] = $this->convertAmountToBe2billFormat($parameters['AMOUNT']);
         }
 
-        $parameters         = $this->sortParameters($parameters);
-        $parameters['HASH'] = $this->getSignature($this->password, $parameters);
+        $parameters['HASH'] = Parameters::getSignature($this->password, $parameters);
 
         $parameters = array(
             'method' => $operation,
             'params' => $parameters,
         );
 
-        return $this->sortParameters($parameters);
+        return Parameters::sortParameters($parameters);
     }
 
     private function configure3dsParameters($operation, array &$parameters)
@@ -166,37 +171,6 @@ class Client
     public function setCurlOption($name, $value)
     {
         $this->curlOptions[$name] = $value;
-    }
-
-    public function sortParameters(array $parameters)
-    {
-        ksort($parameters);
-
-        foreach ($parameters as $name => $value) {
-            if (is_array($value)) {
-                $parameters[$name] = $this->sortParameters($value);
-            }
-        }
-
-        return $parameters;
-    }
-
-    public function getSignature($password, array $parameters)
-    {
-        $parameters = $this->sortParameters($parameters);
-
-        $signature = $password;
-        foreach ($parameters as $name => $value) {
-            if (is_array($value) == true) {
-                foreach ($value as $index => $val) {
-                    $signature .= sprintf('%s[%s]=%s%s', $name, $index, $val, $password);
-                }
-            } else {
-                $signature .= sprintf('%s=%s%s', $name, $value, $password);
-            }
-        }
-
-        return hash('sha256', $signature);
     }
 
     /**

@@ -67,6 +67,16 @@ class Response
         return $this->body->get('ALIAS');
     }
 
+	public function getIdentifier()
+	{
+		return $this->body->get('IDENTIFIER');
+	}
+
+	public function getHash()
+	{
+		return $this->body->get('HASH');
+	}
+
 	/**
 	 * Card code with only last 4 digits shown (XXXXXXXXXXXX1234).
 	 * @return string | null

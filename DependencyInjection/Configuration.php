@@ -26,7 +26,7 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder();
 
         return $treeBuilder
-            ->root('pourquoi_payment_be2bill','array')
+            ->root('pourquoi_payment_be2bill', 'array')
                 ->children()
                     ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
                     ->scalarNode('identifier')->isRequired()->cannotBeEmpty()->end()
