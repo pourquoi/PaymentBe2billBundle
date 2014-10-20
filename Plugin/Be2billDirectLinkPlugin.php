@@ -116,7 +116,7 @@ class Be2billDirectLinkPlugin extends AbstractPlugin
 		$data = $transaction->getPayment()->getPaymentInstruction()->getExtendedData();
 		$parameters = $data->get('be2bill_params');
 
-		$response = $this->formResponse ? : $this->client->sendApiRequest($this->client->configureParameters($method, $parameters));
+		$response = $this->formResponse ? : $this->client->sendApiRequest($this->client->configureParameters($method, $parameters['params']));
 		$this->formResponse = null;
 
 		$transaction->setTrackingId($response->getTransactionId());
