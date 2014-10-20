@@ -96,10 +96,10 @@ class Client
 
         $parameters = array(
             'method' => $operation,
-            'params' => $parameters,
+            'params' => Parameters::sortParameters($parameters),
         );
 
-        return Parameters::sortParameters($parameters);
+        return $parameters;
     }
 
     private function configure3dsParameters($operation, array &$parameters)
