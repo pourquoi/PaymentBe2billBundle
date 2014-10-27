@@ -90,17 +90,7 @@ class Be2billDirectLinkPlugin extends AbstractPlugin
 	 */
 	public function deposit(FinancialTransactionInterface $transaction, $retry)
 	{
-		$data = $transaction->getPayment()->getPaymentInstruction()->getExtendedData();
-		$data = $data->get('be2bill_params');
-		$data = $data['params'];
-
-		$parameters = array(
-			'TRANSACTIONID' => $transaction->getTrackingId(),
-			'AMOUNT' => $transaction->getProcessedAmount(),
-			'ORDERID' => $data['ORDERID']
-		);
-
-		$this->executeMethod($transaction, self::CAPTURE_OPERATION, $parameters);
+		$this->executeMethod($transaction, self::CAPTURE_OPERATION);
 	}
 
 	/**
