@@ -88,10 +88,6 @@ class Client
         $parameters['OPERATIONTYPE'] = $operation;
 		$parameters['VERSION'] = $this->version;
 
-        if (isset($parameters['AMOUNT'])) {
-            $parameters['AMOUNT'] = $this->convertAmountToBe2billFormat($parameters['AMOUNT']);
-        }
-
         $parameters['HASH'] = Parameters::getSignature($this->password, $parameters);
 
         $parameters = array(
