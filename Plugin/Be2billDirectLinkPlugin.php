@@ -90,7 +90,17 @@ class Be2billDirectLinkPlugin extends AbstractPlugin
 	 */
 	public function deposit(FinancialTransactionInterface $transaction, $retry)
 	{
-		$this->executeMethod($transaction, self::CAPTURE_OPERATION);
+		$data = $transaction->getPayment()->getPaymentInstruction()->getExtendedData();
+		$data = $data->get('be2bill_params');
+		$data = $data['params'];
+
+		$parameters = array(
+			'TRANSACTIONID' => $transaction->getTrackingId(),
+			'AMOUNT' => $transaction->getProcessedAmount(),
+			'ORDERID' => $data['ORDERID']
+		);
+
+		$this->executeMethod($transaction, self::CAPTURE_OPERATION, $parameters);
 	}
 
 	/**
@@ -106,17 +116,21 @@ class Be2billDirectLinkPlugin extends AbstractPlugin
 
 	/**
 	 * @param FinancialTransactionInterface $transaction
-	 * @param $method
+	 * @param string $method
+	 * @param array [$parameters]
 	 *
 	 * @throws \JMS\Payment\CoreBundle\Plugin\Exception\FinancialException
 	 * @throws Exception\SecureActionRequiredException
 	 */
-	protected function executeMethod(FinancialTransactionInterface $transaction, $method)
+	protected function executeMethod(FinancialTransactionInterface $transaction, $method, $parameters=null)
 	{
-		$data = $transaction->getPayment()->getPaymentInstruction()->getExtendedData();
-		$parameters = $data->get('be2bill_params');
+		if( !$parameters ) {
+			$data = $transaction->getPayment()->getPaymentInstruction()->getExtendedData();
+			$parameters = $data->get('be2bill_params');
+			$parameters = $parameters['params'];
+		}
 
-		$response = $this->formResponse ? : $this->client->sendApiRequest($this->client->configureParameters($method, $parameters['params']));
+		$response = $this->formResponse ? : $this->client->sendApiRequest($this->client->configureParameters($method, $parameters));
 		$this->formResponse = null;
 
 		$transaction->setTrackingId($response->getTransactionId());
