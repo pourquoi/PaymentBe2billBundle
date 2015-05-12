@@ -40,12 +40,12 @@ class Client
 		$this->version = $version;
         $this->curlOptions = array();
         $this->formEndpoints = array(
-            'sandbox' => $debugBaseUrl . 'form/process',
+            'sandbox' => $debugBaseUrl . 'front/form/process',
             'production' => 'https://secure-magenta1.be2bill.com/front/form/process'
         );
         $this->apiEndpoints = array(
             'sandbox' => array(
-				$debugBaseUrl . 'service/rest/process',
+				$debugBaseUrl . 'front/service/rest/process',
             ),
             'production' => array(
                 'https://secure-magenta1.be2bill.com/front/service/rest/process',
@@ -61,8 +61,8 @@ class Client
 
 	public function setDebugBaseUrl($debugBaseUrl)
 	{
-		$this->formEndpoints['sandbox'] = $debugBaseUrl . 'form/process';
-		$this->apiEndpoints['sandbox'][0] = $debugBaseUrl . 'service/rest/process';
+		$this->formEndpoints['sandbox'] = $debugBaseUrl . 'front/form/process';
+		$this->apiEndpoints['sandbox'][0] = $debugBaseUrl . 'front/service/rest/process';
 	}
 
     public function getDebug()
